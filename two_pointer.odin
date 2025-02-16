@@ -34,6 +34,8 @@ pair_sum_sorted :: proc(nums: []int, target: int) -> []int {
 // Two pointer verison of summing multiple pairs
 pair_sum_sorted_all_pairs :: proc(nums: []int, start: int, target: int) -> [][2]int {
     pairs := [dynamic][2]int{}
+    defer delete(pairs)
+
     left, right := start, len(nums) - 1
 
     for left < right {
@@ -59,6 +61,7 @@ pair_sum_sorted_all_pairs :: proc(nums: []int, start: int, target: int) -> [][2]
 // Two pointer implementation of triplet sum
 triplet_sum :: proc(nums: []int, target: int) -> [][]int {
     triplets: [dynamic][]int = {}
+    defer delete(triplets)
     slice.sort(nums) 
 
     for i in 0..<len(nums) - 1 {
@@ -68,6 +71,8 @@ triplet_sum :: proc(nums: []int, target: int) -> [][]int {
 	pairs := pair_sum_sorted_all_pairs(nums, i + 1, -nums[i])
 	for pair in pairs {
 	    triplet := make([]int, 3)
+	    defer delete(triplet)
+
 	    triplet[0] = nums[i]
 	    triplet[1] = pair[0]
 	    triplet[2] = pair[1]
@@ -123,4 +128,38 @@ test_all_negative :: proc(^testing.T) {
 test_empty_array_trip:: proc(^testing.T) {
     triplets := triplet_sum({}, 0)
     assert(len(triplets) == 0)
+}
+
+@(test)
+test_single_element_trip :: proc(^testing.T) {
+    triplets := triplet_sum({0}, 0)
+    assert(len(triplets) == 0)
+}
+
+@(test)
+test_two_element_trip :: proc(^testing.T) {
+    triplets := triplet_sum({1, -1}, 0)
+    assert(len(triplets) == 0)
+}
+
+@(test)
+test_same_value_trip :: proc(^testing.T) {
+    triplets := triplet_sum({0, 0, 0}, 0)
+    assert(triplets[0][0] == 0)
+    assert(triplets[0][1] == 0)
+    assert(triplets[0][2] == 0)
+}
+
+@(test)
+test_no_sum_trip :: proc(^testing.T) {
+    triplets := triplet_sum({1,0,1}, 0)
+    assert(len(triplets) == 0)
+}
+
+@(test)
+test_duplicate_trip :: proc(^testing.T) {
+    triplets := triplet_sum({0, 0, 1, -1, 1, -1}, 0)
+    assert(triplets[0][0] == -1)
+    assert(triplets[0][1] == 0)
+    assert(triplets[0][2] == 1)
 }
